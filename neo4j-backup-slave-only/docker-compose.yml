@@ -1,0 +1,51 @@
+version: '2'
+
+networks:
+  lan:
+
+services:
+
+  haproxy:
+    image: haproxy:1.7
+    networks:
+      - lan
+    volumes:
+      - ./haproxy:/usr/local/etc/haproxy:ro
+    ports:
+      - "6362:6362"
+      - "8080:8080"
+      - "7474:7474"
+    depends_on:
+      - ha1
+      - ha2
+      - ha3
+
+  ha1:
+    container_name: "ha1"
+    image: neo4j:3.1-enterprise
+    volumes:
+      - ./ha1:/conf
+    networks:
+      - lan
+    environment:
+      - NEO4J_ha_serverId=1
+
+  ha2:
+    container_name: "ha2"
+    image: neo4j:3.1-enterprise
+    volumes:
+      - ./ha2:/conf
+    networks:
+      - lan
+    environment:
+      - NEO4J_ha_serverId=2
+
+  ha3:
+    container_name: "ha3"
+    image: neo4j:3.1-enterprise
+    volumes:
+      - ./ha3:/conf
+    networks:
+      - lan
+    environment:
+      - NEO4J_ha_serverId=3
